@@ -3,6 +3,7 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const commonConfig = require('./webpack.common');
 const packageJson = require('../package.json');
 
+// remember to put http or https before the domain name
 const domain = process.env.PRODUCTION_DOMAIN
 
 const prodConfig = {
