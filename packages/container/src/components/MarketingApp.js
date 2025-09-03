@@ -1,25 +1,31 @@
-import React, { useRef, useEffect } from 'react';
 import { mount } from 'marketing/MarketingApp';
-import { useHistory } from 'react-router-dom';
+import React, { useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default () => {
-  const ref = useRef(null)
-  const history = useHistory()
+  const ref = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const onParentNavigateRef = useRef(null);
 
+  // Mount the microfrontend once
   useEffect(() => {
     const { onParentNavigate } = mount(ref.current, {
-      initialPath: history.location.pathname,
+      initialPath: location.pathname,
       onNavigate: ({ pathname: nextPathname }) => {
-        const { pathname } = history.location;
+        navigate(nextPathname);
+      },
+    });
 
-        if(pathname !== nextPathname) {
-          history.push(nextPathname)
-        }
-      }
-    })
+    onParentNavigateRef.current = onParentNavigate;
+  }, []);
 
-    history.listen(onParentNavigate)
-  }, [])
+  // Sync navigation from container to child
+  useEffect(() => {
+    if (onParentNavigateRef.current) {
+      onParentNavigateRef.current({ pathname: location.pathname });
+    }
+  }, [location]);
 
-  return <div ref={ref}></div>
+  return <div ref={ref} />;
 };
